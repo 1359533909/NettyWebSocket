@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+	<title>基于Netty+WebSocket的聊天室</title>
+	<style type="text/css">
+input { padding-top:0; padding-bottom:0; font-family: "SimSun","宋体";}
+select, input { vertical-align:middle; }
+/*vertical-align 属性设置元素的垂直对齐方式。*/
+ select, input, textarea { font-size:12px; margin:0; }
+textarea { resize:none; }
+/*resize 属性（both）规定是否可由用户调整元素尺寸。 */
+table { border-collapse:collapse; }
+/*为表格设置合并边框模型*/
+h1,h2,h3,h4,h5,h6{font-size:100%; font-weight:normal;}
+body {font-size:12px; color:#999;font-family:"宋体";}
+.clearfix:after { content:"."; display:block; height:0; visibility:hidden; clear:both; }
+.clearfix { zoom:1; }
+.clearit { clear:both; height:0; font-size:0; overflow:hidden; }
+a { color:#999; text-decoration:none; }
+
+a:hover { color:#ff6400; text-decoration:none; }
+/*界面css*/
+.frame{
+	background-color: #ffffff;
+	width: 55%;
+	height: 600px;
+	margin: 10px auto;
+	border-top: 1px solid #ebebeb;
+	border-right: 1px solid #ebebeb;;
+}
+.frame_header{
+    width: 100%;
+    height: 60px;
+    background-color: #abd602;
+    font-family: "微软雅黑";
+}
+h3{
+	color: #ffffff;
+	text-align: center;
+	line-height: 60px;
+	font-size: 20px;
+}
+.frame_left{
+	width: 70%;
+	height: 530px;
+	border-right: 1px solid #ebebeb;
+	border-bottom: 1px solid #ebebeb;
+	border-left: 1px solid #ebebeb;
+	display: inline-block;
+	overflow: hidden;
+
+}
+.frame_right{
+	width:28px;
+	height: 530px;
+	display: inline-block;
+	border-bottom: 1px solid #ebebeb;
+}
+.content_top{
+	width: 100%;
+	height: 420px;
+	border-bottom: 1px solid #ebebeb;
+}
+.textarea_send{
+	width: 99%;
+	height: 72px;
+}
+.button_type{
+	float: right;
+}
+	</style>
+</head>
+<body>
+<form action="" onsubmit="return false">
+	<div class="frame">
+		<header id="header" class="frame_header">
+		     <h3>Netty+WebSocket的聊天室</h3>
+		</header><!-- /header -->
+		<section class="frame_left">
+			<textarea id="msgTxt" style="width:100%;height: 420px;">
+				
+			</textarea><br>
+			<div class="content_bottom">
+				<textarea class="textarea_send" name="msg" id="dtmsg"></textarea>
+				<div class="button_type">
+				<button onclick="send(this.form.msg.value)">发送</button>
+				<button value="清空"  onclick="dtbt()">清空</button>
+				</div>
+			</div>
+		</section>
+		<section class="frame_right"></section>
+	</div>
+</form>
+</body>
+<script type="text/javascript">
+	var socket;
+	if (!window.WebSocket) {
+		alert("不支持websocket！");
+    	window.WebSocket=window.MozWebSocket;
+    }
+	 if (window.WebSocket) {
+		 alert("支持websocket！");
+		 socket=new WebSocket("ws://127.0.0.1:9080/chat");
+		 socket.onmessage=function(event){
+			 var ta=document.getElementById("msgTxt");
+			 ta.value=ta.value+"\n"+event.data;
+		 }
+		 socket.onopen=function(event){
+			 var ta=document.getElementById("msgTxt");
+			 ta.value="连接上服务器";
+		 }
+		 socket.onclose=function(event){
+			 var ta=document.getElementById("msgTxt");
+			 ta.value=ta.value+"\n"+"退出聊天室";
+		 }
+		 function send(msg){
+			 if(!window.WebSocket){
+				 return false;
+			 }
+			 if(socket.readyState==WebSocket.OPEN)
+				 {
+				 	socket.send(msg);
+				 }else{
+					 alert("没有建立连接！");
+				 }
+		 }
+		 function dtbt(){
+			 var ta=document.getElementById("dtmsg");
+			 ta.value="";
+		 }
+    }
+	 
+</script>
+</html>
